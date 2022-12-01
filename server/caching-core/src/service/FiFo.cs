@@ -1,12 +1,12 @@
 using System.Collections;
 
-public class FiFo<T> : ICache<T> where T : Imodel
+public class FiFo<T> : ICache<T> where T : class, Imodel 
 {
     private T[] _cache;
     private readonly long _cacheSize;
     private long head;
     private long tail;
-    private readonly Hashtable _hashtable;
+    private readonly Dictionary<long, long> _dict;
 
     public FiFo(long cacheSize, T[]? preloadItems=null)
     {
@@ -25,24 +25,40 @@ public class FiFo<T> : ICache<T> where T : Imodel
         _cache = preloadItems==null? new T[cacheSize] : preloadItems;
 
         head = 0; 
-        tail = _cache.LongCount();
+        tail = _cache.LongCount() > 0 ? _cache.LongCount(): -1;
         
-        _hashtable = new Hashtable(hashtablesize);
+        _dict = new Dictionary<long, long> (hashtablesize);
 
         if(preloadItems != null)
             foreach(T item in preloadItems)
-                _hashtable.Add(item.GetId(), _hashtable.Count);
+                _dict.Add(item.GetId(), _dict.Count);
     }
-    public async Task Add(T input){
-        if(head == tail)
-        
+    public void Add(T input)
+    {   T subs;
 
-        _cache[pos] = input;
+        if(tail == _cacheSize-1)
+            tail = -1;
+
+        tail++;
+        subs = _cache[tail];
+        _cache[tail]= input;
+
+        if(subs!=null)
+            _dict.Remove(subs.GetId());
+        
+        _dict.Add(input.GetId(), tail);
 
         return;
-
     }
-    public async Task<T> Get(long id){
+    public  T? Get(long id)
+    {   long pos;
+        
+        if(!_dict.TryGetValue(id, out pos))
+        {
+            return null;
+        }
 
+        return _cache[pos];
     }
 }
+   

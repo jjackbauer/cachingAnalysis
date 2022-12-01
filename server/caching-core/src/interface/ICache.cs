@@ -1,5 +1,5 @@
-public interface ICache<T> where T : Imodel
+public interface ICache<T> where T : class, Imodel
 {
-    Task Add(T input);
-    Task<T> Get(long id);
+    void Add(T input);
+    T? Get(long id);
 }
