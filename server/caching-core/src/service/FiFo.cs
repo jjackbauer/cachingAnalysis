@@ -12,14 +12,12 @@ public class FiFo<T> : ICache<T> where T : class, Imodel
     {
         Int32 hashtablesize = (Int32) cacheSize;
 
-        if(cacheSize <= 0){
+        if(cacheSize <= 0)
             throw new Exception("Cache size must be greater than zero");
-        }
+        
 
         if(preloadItems != null && preloadItems.Count() > cacheSize)
-        {
             throw new Exception("Cache size must be greater than preloadItems size");
-        }
 
         _cacheSize = cacheSize;
         _cache = preloadItems==null? new T[cacheSize] : preloadItems;
