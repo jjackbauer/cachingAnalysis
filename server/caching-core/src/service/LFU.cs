@@ -13,6 +13,9 @@ public class LFU<T> : ICache<T> where T : class, Imodel
 
     public LFU(long cacheSize, T[]? preloadItems=null)
     {
+        if(cacheSize <= 0)
+            throw new Exception("cache size must greater than zero");
+            
         _cacheSize = cacheSize;
 
         if(preloadItems != null && preloadItems.Count() > cacheSize)
@@ -56,6 +59,8 @@ public class LFU<T> : ICache<T> where T : class, Imodel
         item.nAccess++;
 
         sortedList[id] = item;
+
+        sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x => x.Value);
 
         return _cache[item.cachePos];
     }
