@@ -2,7 +2,7 @@
 public struct Balance
 {
     public long UserID { get; set; }
-    public double Balance { get; set; }
+    public double Amount { get; set; }
 }
 public struct PaymentAuthorizationRequest{
     public long UserID { get; set; }
