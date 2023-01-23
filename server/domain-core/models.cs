@@ -4,6 +4,10 @@ public struct Balance
     public long UserID { get; set; }
     public double Amount { get; set; }
 }
+
+public class AccountBalance {
+    public Balance current { get; set; }
+}
 public struct PaymentAuthorizationRequest{
     public long UserID { get; set; }
     public double Value { get; set; }
