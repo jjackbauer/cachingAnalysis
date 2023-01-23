@@ -5,6 +5,11 @@ using domain_core;
 [Route("[controller]")]
 public class AuthorizationController : ControllerBase
 {
+    private readonly Config _config;
+    public AuthorizationController()
+    {
+        _config = new Config(CacheStrategy.Fifo, 0);
+    }
     [HttpPost(Name = "PostTransaction")]
     public PaymentAuthorizationResponse PostTransaction(){
         var a = DateTime.Now;
@@ -21,8 +26,8 @@ public class AuthorizationController : ControllerBase
         return output;
     }
 
-    [HttpGet(Name = "It's alive")]
-    public string ItsAlive(){
-        return "I'm Alive";
+    [HttpGet(Name = "Config")]
+    public string Config(){
+        return _config.ToString();
     }
 }

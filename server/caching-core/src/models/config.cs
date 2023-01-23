@@ -1,3 +1,5 @@
+using System.Text;
+
 public enum CacheStrategy
 {
     Fifo,
@@ -13,5 +15,14 @@ public class Config{
     {
         _strategy = Strategy;
         _size = Size;
+    }
+
+    public override string ToString(){
+        var builder = new StringBuilder("Cache Config\n");
+
+        builder.AppendFormat($"Cache Strategy: {(CacheStrategy) _strategy}\n");
+        builder.AppendFormat($"Cache Size: {_size}\n");
+
+        return builder.ToString();
     }
 }
