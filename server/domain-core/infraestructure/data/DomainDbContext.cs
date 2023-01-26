@@ -1,3 +1,4 @@
+using domain_core;
 using Microsoft.EntityFrameworkCore;
 
 public class DomainDbContext : DbContext{

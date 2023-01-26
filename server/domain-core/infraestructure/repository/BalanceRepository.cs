@@ -31,6 +31,6 @@ public class BalanceRepository : IBalanceRepository
 
     public async Task<AccountBalance?> Get(long id)
     {
-       return await _context.AccountBalances.FirstOrDefaultAsync( b => b.current.UserID == id);
+       return await _context.AccountBalances.FirstOrDefaultAsync( b => b.UserID == id);
     }
 }

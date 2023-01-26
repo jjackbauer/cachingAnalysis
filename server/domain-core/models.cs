@@ -6,7 +6,8 @@ public struct Balance
 }
 
 public class AccountBalance {
-    public Balance current { get; set; }
+    public long UserID { get; set; }
+    public double Amount { get; set; }
 }
 public struct PaymentAuthorizationRequest{
     public long UserID { get; set; }

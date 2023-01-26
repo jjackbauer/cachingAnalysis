@@ -9,7 +9,7 @@ public class BalanceMapping : IEntityTypeConfiguration<AccountBalance>
     public void Configure(EntityTypeBuilder<AccountBalance> builder)
     {
         builder.ToTable("tb_acc_balance");
-        builder.HasKey(p => p.current.UserID);
-        builder.Property(p => p.current.Amount);
+        builder.HasKey(p => p.UserID);
+        builder.Property(p => p.Amount);
     }
 }
