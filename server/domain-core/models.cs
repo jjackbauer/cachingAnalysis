@@ -6,6 +6,10 @@ public struct Balance
 }
 
 public class AccountBalance {
+    public AccountBalance()
+    {
+        
+    }
     public long UserID { get; set; }
     public double Amount { get; set; }
 }

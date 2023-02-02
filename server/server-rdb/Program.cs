@@ -7,10 +7,14 @@ using Microsoft.Extensions.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").AddEnvironmentVariables().Build();
+var conn = config.GetConnectionString("PostgresString");
 
-builder.Services.AddDbContext<DomainDbContext>(
-    opt => opt.UseNpgsql(config.GetConnectionString("PostgresString"))
-    );
+builder.Services.AddDbContext<DomainDbContext>
+(
+    
+    opt => opt.UseNpgsql(conn)
+);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -25,7 +29,14 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DomainDbContext>();
+    db.Database.Migrate();
+}
+
 //app.UseHttpsRedirection();
+
 
 app.UseAuthorization();
 
