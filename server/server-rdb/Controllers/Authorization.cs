@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using domain_core;
+using System.Diagnostics;
 
 [ApiController]
 [Route("[controller]")]
@@ -16,16 +17,51 @@ public class AuthorizationController : ControllerBase
     public async Task<PaymentAuthorizationResponse> PostTransaction(){
         var a = DateTime.Now;
         var b = DateTime.Now;
-        
-        
         var balance = new AccountBalance{
                 Amount = 100,
                 UserID = 1
             };
 
+        List<double> cacheTimeElapses = new List<double>();
+        List<double> dbTimeElapses = new List<double>();
+
+
+        List<AccountBalance> buffer = new List<AccountBalance>();
+
+        buffer.Add(balance);
+        
+        ICache<AccountBalance> cache = new FiFo<AccountBalance>(1000, buffer.ToArray());
+    
+    long start;
+    
+    for(int c =0 ; c< 100; c++)
+    {
+        start = Stopwatch.GetTimestamp();
+            cache.Get(balance.UserID); 
+        cacheTimeElapses.Add(Stopwatch.GetElapsedTime(start).TotalNanoseconds);
+        
+    }
+        
+        
+
         await _repository.Add(balance);
 
         await _repository.Commit();
+
+    for(int c = 0; c < 100 ; c++ )
+    {
+        start = Stopwatch.GetTimestamp();
+        await _repository.Get(balance.UserID);
+
+        dbTimeElapses.Add(Stopwatch.GetElapsedTime(start).TotalNanoseconds);
+    }
+        var dbAvg = dbTimeElapses.Average();
+        var cacheAvg = cacheTimeElapses.Average();
+        var cacheisFasterBy = dbAvg/cacheAvg;
+
+        var dbTimeElapsesVar = dbTimeElapses.Average(x => Math.Pow(x - dbAvg, 2));
+
+        var cacheTimeElapsesVar = cacheTimeElapses.Average(x => Math.Pow(x - cacheAvg, 2));
     
        PaymentAuthorizationResponse output = new PaymentAuthorizationResponse{
             Approved = true,
