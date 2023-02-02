@@ -1,17 +1,29 @@
 ﻿namespace domain_core;
+
 public struct Balance
 {
     public long UserID { get; set; }
     public double Amount { get; set; }
 }
 
-public class AccountBalance {
+public class AccountBalance :Imodel
+{
     public AccountBalance()
     {
         
     }
     public long UserID { get; set; }
     public double Amount { get; set; }
+
+    public long GetId()
+    {
+        return UserID;
+    }
+
+    public Imodel New()
+    {
+        return new AccountBalance();
+    }
 }
 public struct PaymentAuthorizationRequest{
     public long UserID { get; set; }
