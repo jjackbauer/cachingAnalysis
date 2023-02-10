@@ -36,3 +36,9 @@ public struct PaymentAuthorizationResponse{
     public double TimeElapsedInNanosseconds {get; set;}
     public bool CacheHit {get; set;}
 }
+
+public struct ServerConfigurationRequest
+{
+    public CacheStrategy strategy { get; set; }
+    public long cacheSize { get; set; }
+}

@@ -3,13 +3,14 @@ using System.Text;
 public enum CacheStrategy
 {
     Fifo,
-    LFU
+    LFU,
+    None
 }
 
 public class Config{
 
-    public readonly CacheStrategy _strategy;
-    public  readonly long _size;
+    public  CacheStrategy _strategy {get; set;}
+    public  long _size {get; set;}
 
     public Config(CacheStrategy Strategy, long Size)
     {
@@ -24,5 +25,10 @@ public class Config{
         builder.AppendFormat($"Cache Size: {_size}\n");
 
         return builder.ToString();
+    }
+
+    public void Configure(CacheStrategy Strategy, long Size){
+        _size = Size;
+        _strategy = Strategy;
     }
 }

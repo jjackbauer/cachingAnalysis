@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using domain_core;
 using System.Diagnostics;
 
+[Route("api/v1/[controller]")]
 [ApiController]
-[Route("[controller]")]
 public class AuthorizationController : ControllerBase
 {
     private readonly Config _config;
@@ -14,7 +14,7 @@ public class AuthorizationController : ControllerBase
         _repository = repository;
     }
     [HttpPost(Name = "PostTransaction")]
-    public async Task<PaymentAuthorizationResponse> PostTransaction(){
+    public async Task<PaymentAuthorizationResponse> PostTransaction(PaymentAuthorizationRequest input){
         var a = DateTime.Now;
         var b = DateTime.Now;
         var balance = new AccountBalance{
@@ -74,8 +74,19 @@ public class AuthorizationController : ControllerBase
         return output;
     }
 
-    [HttpGet(Name = "Config")]
-    public string Config(){
-        return _config.ToString();
+    [HttpGet(Name = "Get Server Configuration")]
+    public Config Config()
+    {
+        return _config;
+    }
+
+
+    [HttpPut(Name = "Define Server Configuration")]
+    public async Task<Config> ConfigureServer(ServerConfigurationRequest input)
+    {
+        _config.Configure(input.strategy, input.cacheSize);
+
+
+        return _config;
     }
 }
