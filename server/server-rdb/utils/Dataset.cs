@@ -2,7 +2,7 @@ using domain_core;
 
 public static class Dataset
 {
-    public async static void PopulateDatabase(IBalanceRepository repository, long datasetSize)
+    public async static Task PopulateDatabase(IBalanceRepository repository, long datasetSize)
     {   var rand = new Random();
 
         
@@ -12,21 +12,20 @@ public static class Dataset
             await repository.Add(new AccountBalance
                 {
                     UserID = c,
-                    Amount = 10000*rand.NextDouble(),
+                    Amount = 10000.0*rand.NextDouble(),
 
                 });
+
+            
         }
 
-        
-
-        var rows =  await repository.Commit();
-
-        Console.WriteLine($"Erased {rows} rows from database");
+        await repository.Commit();
+        Console.WriteLine($"Added {datasetSize} rows from database");
 
         return;
     }
 
-    public async static void EraseDatabase(IBalanceRepository repository)
+    public async static Task EraseDatabase(IBalanceRepository repository)
     {
         await repository.Erase();
         var rows =  await repository.Commit();

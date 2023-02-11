@@ -33,6 +33,14 @@ using (var scope = app.Services.CreateScope())
 }
 
 
+using (var scope = app.Services.CreateScope())
+{
+    var repository = scope.ServiceProvider.GetRequiredService<IBalanceRepository>();
+    await Dataset.EraseDatabase(repository);
+    await Dataset.PopulateDatabase(repository, 10000);    
+}
+
+
 //app.UseHttpsRedirection();
 
 
