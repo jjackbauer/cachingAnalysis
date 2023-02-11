@@ -19,4 +19,15 @@ public class DomainDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
+  
+}  
+
+public static class DbContextExtensions
+{
+    public static void Clear<T>(this DbContext context) where T : class
+    {
+        context.Set<T>().RemoveRange(context.Set<T>());
+        context.SaveChanges();
+    }
 }

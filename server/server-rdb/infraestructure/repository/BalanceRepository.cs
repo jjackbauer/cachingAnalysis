@@ -29,6 +29,11 @@ public class BalanceRepository : IBalanceRepository
        return await _context.SaveChangesAsync();
     }
 
+    public async Task Erase()
+    {
+        _context.Clear<AccountBalance>();
+    }
+
     public async Task<AccountBalance?> Get(long id)
     {
        return await _context.AccountBalances.FirstOrDefaultAsync( b => b.UserID == id);

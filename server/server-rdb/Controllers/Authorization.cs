@@ -12,6 +12,8 @@ public class AuthorizationController : ControllerBase
     {
         _config = new Config(CacheStrategy.Fifo, 0);
         _repository = repository;
+        //Dataset.EraseDatabase(_repository);
+        Dataset.PopulateDatabase(_repository, 100000);
     }
     [HttpPost(Name = "PostTransaction")]
     public async Task<PaymentAuthorizationResponse> PostTransaction(PaymentAuthorizationRequest input){
@@ -85,8 +87,6 @@ public class AuthorizationController : ControllerBase
     public async Task<Config> ConfigureServer(ServerConfigurationRequest input)
     {
         _config.Configure(input.strategy, input.cacheSize);
-
-
         return _config;
     }
 }
