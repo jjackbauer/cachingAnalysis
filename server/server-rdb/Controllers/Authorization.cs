@@ -6,21 +6,40 @@ using System.Diagnostics;
 [ApiController]
 public class AuthorizationController : ControllerBase
 {
-    private readonly Config _config;
+    private static Config _config;
     private readonly IBalanceRepository _repository;
 
-    private readonly ICache<AccountBalance> _cache;
-    private readonly BalanceOmniRepository _omniRepository;
+    private  static ICache<AccountBalance> _cache;
+    private BalanceOmniRepository _omniRepository;
     public AuthorizationController(IBalanceRepository repository)
     {
-        _config = new Config(CacheStrategy.Fifo, 0);
+        if (_config is null )
+            _config = new Config(CacheStrategy.Fifo, 3);
+        
         _repository = repository;
-        _cache = new FiFo<AccountBalance>(0);
+        if (_cache is null)
+            _cache = new FiFo<AccountBalance>(3);
+        
         _omniRepository = new BalanceOmniRepository(_repository, _config, _cache);
     }
     [HttpPost(Name = "PostTransaction")]
-    public async Task<PaymentAuthorizationResponse> PostTransaction(PaymentAuthorizationRequest input){
-        throw new NotImplementedException();
+    public async Task<ActionResult> PostTransaction(PaymentAuthorizationRequest input){
+        
+    PaymentAuthorizationResponse output = new PaymentAuthorizationResponse();
+
+    output.ArrivalTime = DateTime.Now;
+
+
+       var balance =  await _omniRepository.GetAccountBalance(input.UserID);
+
+       if (balance is null)
+        return NotFound($"balance for userid = {input.UserID} not found");
+
+        output.Approved = balance.Amount >= input.Value;
+        output.CacheHit = _omniRepository.cacheHit;
+        output.DepartureTime = DateTime.Now;
+
+        return Ok(output);
     }
 
     [HttpGet(Name = "Get Server Configuration")]
@@ -34,6 +53,23 @@ public class AuthorizationController : ControllerBase
     public async Task<Config> ConfigureServer(ServerConfigurationRequest input)
     {
         _config.Configure(input.strategy, input.cacheSize);
+
+        _cache = input.strategy == CacheStrategy.Fifo ?
+                                        new FiFo<AccountBalance>(input.cacheSize)
+                                        :
+                                        new LFU<AccountBalance>(input.cacheSize);
+
+        _omniRepository = new BalanceOmniRepository(
+                                _repository,
+                                _config,
+                                _cache
+            );
+
+        
+        GC.Collect();
+
+        GC.WaitForFullGCComplete();
+
         return _config;
     }
 }
