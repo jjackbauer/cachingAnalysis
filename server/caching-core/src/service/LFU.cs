@@ -37,11 +37,25 @@ public class LFU<T> : ICache<T> where T : class, Imodel
     }
     public void Add(T input)
     {  
+        if(tail+1 < _cacheSize)
+        {
+            tail++;
+            _cache[tail] = input;
+
+            sortedList.Add(input.GetId(), new LFUNode(){
+                cachePos = tail,
+                nAccess= 0
+            });
+
+            return;
+        }
+
         sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x=> x.Value);
         var elementToRemove = sortedList.Last();
 
       _cache[elementToRemove.Value.cachePos] = input;
       sortedList.Remove(elementToRemove.Key);
+
       sortedList.Add(input.GetId(), new LFUNode(){
         cachePos = elementToRemove.Value.cachePos,
         nAccess= 0
