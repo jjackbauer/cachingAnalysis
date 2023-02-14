@@ -23,7 +23,7 @@ public class FiFo<T> : ICache<T> where T : class, Imodel
         _cache = preloadItems==null? new T[cacheSize] : preloadItems;
 
         head = 0; 
-        tail = _cache.LongCount() > 0 ? _cache.LongCount(): -1;
+        tail = preloadItems is null ? -1 : preloadItems.Length;
         
         _dict = new Dictionary<long, long> (hashtablesize);
 

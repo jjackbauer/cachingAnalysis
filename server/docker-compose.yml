@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  # serverrdb:
+  #   build:
+  #     context: .
+  #     dockerfile: server-rdb/Dockerfile
+  #   ports:
+  #   - 9009:80
+  #   depends_on:
+  #     - postgresdb
+  postgresdb:
+    container_name: postgresdb
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: PASSWORD
