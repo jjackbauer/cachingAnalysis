@@ -38,6 +38,7 @@ public class AuthorizationController : ControllerBase
         output.Approved = balance.Amount >= input.Value;
         output.CacheHit = _omniRepository.cacheHit;
         output.DepartureTime = DateTime.Now;
+        output.TimeElapsedInNanosseconds = Stopwatch.GetElapsedTime(output.ArrivalTime.Ticks, output.DepartureTime.Ticks).TotalNanoseconds;
 
         return Ok(output);
     }
