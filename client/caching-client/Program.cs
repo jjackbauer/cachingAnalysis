@@ -2,76 +2,43 @@
 using domain_core;
 using Newtonsoft.Json;
 
-var host = "localhost";
-var port = 5122;
+//Configurations
+enviromentVars env;
 
-GetCommandLineArgs();
+var cacheSizes = new int[] {500, 1000, 2000};
+var CacheStrategies =  new CacheStrategy[] {CacheStrategy.Fifo, CacheStrategy.LFU };
+var nRequests = 1000000;
 
-HttpClient client = new HttpClient{
-    BaseAddress = new Uri($"http://{host}:{port}")
-};
+env  = Utils.GetCommandLineArgs(args);
+HttpClient client = Utils.ConfigureHttpClient(env);
 
+AuthorizationClient serverClient = new AuthorizationClient(client);
 
-ConfigureHttpClient();
-
-
-ConfigureServer(3, CacheStrategy.Fifo);//Temporário
-
-
-
-
-
-
-
-void GetCommandLineArgs()
-{
-    if(args.Length > 2)
+foreach (int size in cacheSizes)
+    foreach(CacheStrategy strategy in CacheStrategies)
     {
-        host = args[1];
-        port = Int32.Parse(args[2]);
-    }
-        
-}
+        while(!serverClient.ConfigureServer(size, strategy));
 
+        var Config = serverClient.GetServerConfiguration();
 
+        if(Config is not null)
+        {
+            var success = Config._size == size && Config._strategy == strategy;
 
+            Console.WriteLine($"Running Server Configurations | {Config.ToString()}");
+            Console.WriteLine($"Configuration Process Success | {success}\n");   
+        }
 
-void ConfigureHttpClient()
-{
-    var builder = new System.UriBuilder{
-        Host = host,
-        Port = port,
-    };
-
-    client.BaseAddress = builder.Uri;
-
-}
-
-void ConfigureServer(long cacheSize, CacheStrategy strategy)
-{
-    var route = $"api/v1/Authorization";
-    ServerConfigurationRequest req = new ServerConfigurationRequest{
-        cacheSize = cacheSize,
-        strategy = strategy
-    };
-
-    StringContent content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8,"application/json");
-    var res = client.PutAsync(route, content).GetAwaiter().GetResult();
-
-    if (!res.IsSuccessStatusCode)
-    {
-        Console.WriteLine($"error configuring server | cacheSize: {cacheSize} strategy: {(CacheStrategy) strategy}");
-        return;
-    }
-    var stringRes = res.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-    Config ?output = JsonConvert.DeserializeObject<Config>(stringRes);
-
-    if (output is null)
-    {
-        Console.WriteLine($"error parsing response from  server | response {stringRes}");
-        return;
+        var responses = new List<PaymentAuthorizationResponse>(nRequests);
+        for(int c =0 ; c < nRequests ; c++)
+        { 
+            PaymentAuthorizationRequest req = new PaymentAuthorizationRequest(){
+                UserID = 1 ,
+                Value = 20
+            };
+            var res = serverClient.AuthorizePayment(req);
+        }
     }
 
-    Console.WriteLine($"server sucessfully configured | cacheSize: {output._size} strategy: {(CacheStrategy) output._strategy}");
-}
+
+
