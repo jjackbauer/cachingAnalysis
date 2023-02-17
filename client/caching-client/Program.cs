@@ -10,7 +10,6 @@ var cacheSizes = new int[] { 5000, 4000, 3000 };
 var CacheStrategies = new CacheStrategy[] { CacheStrategy.Fifo, CacheStrategy.LFU };
 var nRequests = 1000000;
 
-
 var z = new Zipf(nRegisters);
 var rGen = new RequestGenerator(z);
 
@@ -51,6 +50,8 @@ foreach (int size in cacheSizes)
             var res = serverClient.AuthorizePayment(req);
 
             if(res is not null){
+
+                responses.Add(res.Value);
                 ServiceTimes.Add(res.Value.TimeElapsedInNanosseconds);
 
                 if(res.Value.CacheHit){
@@ -73,6 +74,8 @@ foreach (int size in cacheSizes)
         Statistics.Stats<double>("Ts (cache)", ServiceTimesCache);
         Statistics.Stats<double>("Ts (db)", ServiceTimesDb);
 
+        var w = new CsvWriter<PaymentAuthorizationResponse>($"exp/csv/{strategy}-{size}-{nRequests}-{DateTime.Now.Ticks}.csv");
+        w.WriteListToCsv(responses);
     }
 
 
