@@ -74,7 +74,7 @@ public class LFU<T> : ICache<T> where T : class, Imodel
 
         sortedList[id] = item;
 
-        sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x => x.Value);
+        //sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x => x.Value);
 
         return _cache[item.cachePos];
     }
