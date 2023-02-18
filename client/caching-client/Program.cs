@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 enviromentVars env;
 var nRegisters = 10000;
 //var cacheSizes = new int[] { 500, 1000, 2000 }; //Aumentar é interessante...
-var cacheSizes = new int[] { 5000, 4000, 3000 };
+var cacheSizes = new int[] { 7500, 5000, 2500 };
 var CacheStrategies = new CacheStrategy[] { CacheStrategy.Fifo, CacheStrategy.LFU };
 var nRequests = 1000000;
 
