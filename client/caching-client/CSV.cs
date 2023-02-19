@@ -30,5 +30,7 @@ public class CsvWriter<T>
                 writer.WriteLine(row);
             }
         }
+
+        Console.WriteLine($"written {list.Count} lines in csv file: {_filePath} ");
     }
 }
