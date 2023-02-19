@@ -4,7 +4,8 @@ public enum CacheStrategy
 {
     Fifo,
     LFU,
-    None
+    None,
+    Only
 }
 
 public class Config{
