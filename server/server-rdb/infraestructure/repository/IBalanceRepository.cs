@@ -6,6 +6,6 @@ public interface IBalanceRepository
     Task AddMany(IEnumerable<AccountBalance> input);
     Task<AccountBalance?> Get(long id);
     Task<long> Commit();
-
+    Task<AccountBalance[]> GetAll();
     Task Erase();
 }
