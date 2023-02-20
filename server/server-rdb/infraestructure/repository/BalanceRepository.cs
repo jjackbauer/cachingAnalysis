@@ -38,4 +38,9 @@ public class BalanceRepository : IBalanceRepository
     {
        return await _context.AccountBalances.FirstOrDefaultAsync( b => b.UserID == id);
     }
+
+    async Task<AccountBalance[]> IBalanceRepository.GetAll()
+    {
+        return await _context.AccountBalances.ToArrayAsync();
+    }
 }

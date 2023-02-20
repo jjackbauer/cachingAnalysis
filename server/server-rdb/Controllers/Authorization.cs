@@ -14,11 +14,11 @@ public class AuthorizationController : ControllerBase
     public AuthorizationController(IBalanceRepository repository)
     {
         if (_config is null )
-            _config = new Config(CacheStrategy.Fifo, 3);
+            _config = new Config(CacheStrategy.None, 0);
         
         _repository = repository;
         if (_cache is null)
-            _cache = new FiFo<AccountBalance>(3);
+            _cache = new None<AccountBalance>();
         
         _omniRepository = new BalanceOmniRepository(_repository, _config, _cache);
     }
@@ -38,6 +38,7 @@ public class AuthorizationController : ControllerBase
         output.Approved = balance.Amount >= input.Value;
         output.CacheHit = _omniRepository.cacheHit;
         output.DepartureTime = DateTime.Now;
+        output.TimeElapsedInNanosseconds = Stopwatch.GetElapsedTime(output.ArrivalTime.Ticks, output.DepartureTime.Ticks).TotalNanoseconds;
 
         return Ok(output);
     }
@@ -54,10 +55,25 @@ public class AuthorizationController : ControllerBase
     {
         _config.Configure(input.strategy, input.cacheSize);
 
-        _cache = input.strategy == CacheStrategy.Fifo ?
-                                        new FiFo<AccountBalance>(input.cacheSize)
-                                        :
-                                        new LFU<AccountBalance>(input.cacheSize);
+        switch(input.strategy)
+        {
+            case CacheStrategy.Fifo:
+                _cache = new FiFo<AccountBalance>(input.cacheSize);
+                break;
+            case CacheStrategy.LFU:
+                _cache = new LFU<AccountBalance>(input.cacheSize);
+                break;
+            case CacheStrategy.None:
+                _cache = new None<AccountBalance>();
+                break;
+            case CacheStrategy.Only:
+                var preloadItems = await _repository.GetAll();
+                _cache = new Only<AccountBalance>(preloadItems, preloadItems.Length);
+                break;
+            default:
+                _cache = new None<AccountBalance>();
+                break;
+        }
 
         _omniRepository = new BalanceOmniRepository(
                                 _repository,

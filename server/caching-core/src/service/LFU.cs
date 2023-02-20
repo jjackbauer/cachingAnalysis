@@ -50,8 +50,8 @@ public class LFU<T> : ICache<T> where T : class, Imodel
             return;
         }
 
-        sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x=> x.Value);
-        var elementToRemove = sortedList.Last();
+        //sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x=> x.Value);
+        var elementToRemove = sortedList.Aggregate((l, r) => l.Value.nAccess < r.Value.nAccess ? l : r);
 
       _cache[elementToRemove.Value.cachePos] = input;
       sortedList.Remove(elementToRemove.Key);
@@ -74,7 +74,7 @@ public class LFU<T> : ICache<T> where T : class, Imodel
 
         sortedList[id] = item;
 
-        sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x => x.Value);
+        //sortedList = sortedList.OrderByDescending(x => x.Value.nAccess).ToDictionary(x => x.Key, x => x.Value);
 
         return _cache[item.cachePos];
     }
